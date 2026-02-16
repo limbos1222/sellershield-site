@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SellerShield — Вход</title>
+<meta name="description" content="Войдите в SellerShield или создайте аккаунт для защиты вашего бизнеса на маркетплейсах.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--blue:#2563EB;--blue-dark:#1E40AF;--blue-50:#EFF6FF;--blue-100:#DBEAFE;--blue-200:#BFDBFE;
+--navy:#0F172A;--text:#1E293B;--text-2:#475569;--text-3:#64748B;--text-4:#94A3B8;
+--border:#E2E8F0;--bg:#FFFFFF;--bg-2:#F8FAFC;--bg-3:#F1F5F9;
+--green:#059669;--red:#DC2626;
+}
+body{font-family:'Onest',sans-serif;background:var(--bg-2);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* Layout */
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow:hidden}
+.auth-wrap::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(37,99,235,.06) 0%,transparent 70%);pointer-events:none}
+.auth-wrap::after{content:'';position:absolute;bottom:-200px;left:-200px;width:500px;height:500px;background:radial-gradient(circle,rgba(37,99,235,.04) 0%,transparent 70%);pointer-events:none}
+
+.auth-card{width:100%;max-width:420px;position:relative;z-index:1}
+
+/* Logo */
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:36px;text-decoration:none}
+.auth-logo-dot{width:36px;height:36px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:900}
+.auth-logo-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px}
+
+/* Tabs */
+.auth-tabs{display:flex;background:var(--bg-3);border-radius:10px;padding:4px;margin-bottom:28px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;color:var(--text-3);border:none;background:none;border-radius:7px;cursor:pointer;transition:all .2s;font-family:inherit}
+.auth-tab.active{background:var(--bg);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.auth-tab:hover:not(.active){color:var(--text-2)}
+
+/* Form card */
+.auth-form-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:32px;box-shadow:0 4px 24px rgba(0,0,0,.04)}
+
+/* Form */
+.auth-form{display:none}
+.auth-form.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+.field input,.field select{width:100%;padding:12px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;color:var(--navy);font-size:14px;font-weight:500;font-family:inherit;outline:none;transition:all .2s}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+.field input:focus,.field select:focus{border-color:var(--blue);background:var(--bg);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.field input::placeholder{color:var(--text-4)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-hint{font-size:12px;color:var(--text-4);margin-top:4px}
+
+/* Password field */
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:44px}
+.pass-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-4);cursor:pointer;font-size:16px;padding:4px;transition:color .2s}
+.pass-toggle:hover{color:var(--text-2)}
+
+/* Button */
+.auth-btn{width:100%;padding:14px;background:var(--blue);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.auth-btn:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.25)}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.auth-btn .spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite}
+.auth-btn.loading .spinner{display:block}
+.auth-btn.loading .btn-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Divider */
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text-4);font-size:12px;font-weight:500}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Social btn */
+.auth-social{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--navy);font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.auth-social:hover{border-color:var(--blue);background:var(--blue-50);transform:translateY(-1px)}
+.auth-social svg{width:20px;height:20px}
+
+/* Error */
+.auth-error{background:#FEF2F2;border:1px solid #FECACA;color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:16px;display:none;align-items:center;gap:8px}
+.auth-error.show{display:flex}
+
+/* Success */
+.auth-success{display:none;text-align:center;padding:20px 0;animation:fadeIn .4s ease}
+.auth-success.show{display:block}
+.auth-success-icon{font-size:48px;margin-bottom:12px}
+.auth-success h3{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.auth-success p{color:var(--text-2);font-size:14px;line-height:1.6}
+
+/* Footer note */
+.auth-footer{text-align:center;margin-top:24px;font-size:13px;color:var(--text-4)}
+.auth-footer a{color:var(--blue);text-decoration:none;font-weight:500}
+.auth-footer a:hover{text-decoration:underline}
+
+/* Checkbox */
+.check-row{display:flex;align-items:flex-start;gap:8px;margin:16px 0 4px}
+.check-row input[type="checkbox"]{margin-top:3px;accent-color:var(--blue);width:16px;height:16px;cursor:pointer}
+.check-row label{font-size:13px;color:var(--text-3);cursor:pointer;line-height:1.5}
+.check-row label a{color:var(--blue);text-decoration:none}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;padding:14px 22px;border-radius:10px;font-size:14px;font-weight:500;z-index:500;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;max-width:340px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+@media(max-width:480px){
+.auth-form-card{padding:24px 18px}
+.field-row{grid-template-columns:1fr}
+.auth-wrap{padding:24px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+<div class="auth-card">
+
+<!-- Logo -->
+<a href="index.html" class="auth-logo">
+<div class="auth-logo-dot">S</div>
+<div class="auth-logo-text">SellerShield</div>
+</a>
+
+<!-- Tabs -->
+<div class="auth-tabs">
+<button class="auth-tab active" onclick="switchTab('login')">Войти</button>
+<button class="auth-tab" onclick="switchTab('register')">Регистрация</button>
+</div>
+
+<div class="auth-form-card">
+
+<!-- Error message -->
+<div class="auth-error" id="authError"><span>⚠</span> <span id="authErrorText"></span></div>
+
+<!-- ═══════ LOGIN FORM ═══════ -->
+<div class="auth-form active" id="loginForm">
+<div class="field">
+<label>Email</label>
+<input type="email" id="loginEmail" placeholder="ivan@example.com" autocomplete="email">
+</div>
+<div class="field">
+<label>Пароль</label>
+<div class="pass-wrap">
+<input type="password" id="loginPass" placeholder="Введите пароль" autocomplete="current-password">
+<button class="pass-toggle" onclick="togglePass('loginPass', this)" type="button">👁</button>
+</div>
+</div>
+<div style="text-align:right;margin:-10px 0 16px">
+<a href="#" style="font-size:13px;color:var(--blue);text-decoration:none;font-weight:500" onclick="forgotPassword(event)">Забыли пароль?</a>
+</div>
+<button class="auth-btn" id="loginBtn" onclick="handleLogin()">
+<span class="btn-text">Войти</span>
+<div class="spinner"></div>
+</button>
+
+<div class="auth-divider">или</div>
+
+<button class="auth-social" onclick="telegramLogin()">
+<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" fill="#2563EB"/></svg>
+Войти через Telegram
+</button>
+</div>
+
+<!-- ═══════ REGISTER FORM ═══════ -->
+<div class="auth-form" id="registerForm">
+<div class="field-row">
+<div class="field">
+<label>Имя</label>
+<input type="text" id="regName" placeholder="Иван" autocomplete="given-name">
+</div>
+<div class="field">
+<label>Фамилия</label>
+<input type="text" id="regSurname" placeholder="Иванов" autocomplete="family-name">
+</div>
+</div>
+<div class="field">
+<label>Email</label>
+<input type="email" id="regEmail" placeholder="ivan@example.com" autocomplete="email">
+</div>
+<div class="field">
+<label>Телефон / Telegram</label>
+<input type="text" id="regPhone" placeholder="+7 900 123-45-67">
+<div class="field-hint">Для уведомлений и связи</div>
+</div>
+<div class="field">
+<label>Основной маркетплейс</label>
+<select id="regMarket">
+<option value="wb">Wildberries</option>
+<option value="ozon">Ozon</option>
+<option value="ym">Яндекс Маркет</option>
+<option value="multi">Несколько площадок</option>
+</select>
+</div>
+<div class="field">
+<label>Пароль</label>
+<div class="pass-wrap">
+<input type="password" id="regPass" placeholder="Минимум 8 символов" autocomplete="new-password">
+<button class="pass-toggle" onclick="togglePass('regPass', this)" type="button">👁</button>
+</div>
+</div>
+<div class="field">
+<label>Подтвердите пароль</label>
+<div class="pass-wrap">
+<input type="password" id="regPass2" placeholder="Повторите пароль" autocomplete="new-password">
+<button class="pass-toggle" onclick="togglePass('regPass2', this)" type="button">👁</button>
+</div>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="regAgree">
+<label for="regAgree">Согласен с <a href="#">условиями использования</a> и <a href="#">политикой конфиденциальности</a></label>
+</div>
+
+<button class="auth-btn" id="regBtn" onclick="handleRegister()">
+<span class="btn-text">Создать аккаунт</span>
+<div class="spinner"></div>
+</button>
+
+<div class="auth-divider">или</div>
+
+<button class="auth-social" onclick="telegramLogin()">
+<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" fill="#2563EB"/></svg>
+Регистрация через Telegram
+</button>
+</div>
+
+<!-- ═══════ SUCCESS STATE ═══════ -->
+<div class="auth-success" id="regSuccess">
+<div class="auth-success-icon">✅</div>
+<h3>Аккаунт создан!</h3>
+<p>Перенаправляем в личный кабинет...</p>
+</div>
+
+</div>
+
+<!-- Footer -->
+<div class="auth-footer">
+<a href="index.html">← Вернуться на сайт</a>
+</div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════ CONFIG ═══════ */
+const CONFIG = {
+  TELEGRAM_BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',
+  TELEGRAM_CHAT_ID: 'YOUR_CHAT_ID_HERE',
+  DASHBOARD_URL: 'dashboard.html'
+};
+
+/* ═══════ TAB SWITCHING ═══════ */
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+  });
+  document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+  document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+  document.getElementById('regSuccess').classList.remove('show');
+  hideError();
+}
+
+// Auto-detect from URL hash
+if (window.location.hash === '#register' || window.location.search.includes('register')) {
+  switchTab('register');
+}
+
+/* ═══════ PASSWORD TOGGLE ═══════ */
+function togglePass(id, btn) {
+  const input = document.getElementById(id);
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  btn.textContent = isPass ? '🙈' : '👁';
+}
+
+/* ═══════ ERROR HANDLING ═══════ */
+function showError(text) {
+  const el = document.getElementById('authError');
+  document.getElementById('authErrorText').textContent = text;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function hideError() {
+  document.getElementById('authError').classList.remove('show');
+}
+
+/* ═══════ TOAST ═══════ */
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show ' + type;
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+/* ═══════ LOGIN ═══════ */
+async function handleLogin() {
+  hideError();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+
+  if (!email) return showError('Введите email');
+  if (!email.includes('@')) return showError('Проверьте email');
+  if (!pass) return showError('Введите пароль');
+  if (pass.length < 6) return showError('Пароль слишком короткий');
+
+  const btn = document.getElementById('loginBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // Симуляция запроса (заменить на реальный API)
+  await new Promise(r => setTimeout(r, 1200));
+
+  // Проверяем localStorage (простая демо-авторизация)
+  const users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+  const user = users.find(u => u.email === email && u.password === pass);
+
+  if (user) {
+    localStorage.setItem('ss_current_user', JSON.stringify(user));
+    showToast('Добро пожаловать!', 'success');
+    setTimeout(() => window.location.href = CONFIG.DASHBOARD_URL, 800);
+  } else {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    showError('Неверный email или пароль');
+  }
+}
+
+/* ═══════ REGISTER ═══════ */
+async function handleRegister() {
+  hideError();
+  const name = document.getElementById('regName').value.trim();
+  const surname = document.getElementById('regSurname').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const market = document.getElementById('regMarket').value;
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  const agree = document.getElementById('regAgree').checked;
+
+  // Validation
+  if (!name) return showError('Введите имя');
+  if (!email || !email.includes('@')) return showError('Введите корректный email');
+  if (!phone || phone.length < 5) return showError('Введите телефон или Telegram');
+  if (pass.length < 8) return showError('Пароль должен быть минимум 8 символов');
+  if (pass !== pass2) return showError('Пароли не совпадают');
+  if (!agree) return showError('Примите условия использования');
+
+  // Check existing
+  const users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+  if (users.find(u => u.email === email)) return showError('Этот email уже зарегистрирован');
+
+  const btn = document.getElementById('regBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // Сохраняем пользователя
+  const user = {
+    id: Date.now().toString(36),
+    name, surname, email, phone, market,
+    password: pass,
+    plan: 'free', // Не оплачен
+    created: new Date().toISOString()
+  };
+
+  users.push(user);
+  localStorage.setItem('ss_users', JSON.stringify(users));
+  localStorage.setItem('ss_current_user', JSON.stringify(user));
+
+  // Отправляем уведомление в Telegram
+  if (CONFIG.TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN_HERE') {
+    const marketNames = { wb: 'Wildberries', ozon: 'Ozon', ym: 'Яндекс Маркет', multi: 'Несколько' };
+    const msg = `🆕 *Новая регистрация*\n\n👤 ${name} ${surname}\n📧 ${email}\n📱 ${phone}\n🏪 ${marketNames[market] || market}\n📅 ${new Date().toLocaleString('ru-RU')}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CONFIG.TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+      });
+    } catch (e) { console.warn('TG failed:', e); }
+  }
+
+  console.log('📋 NEW USER:', user);
+
+  // Show success
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('regSuccess').classList.add('show');
+
+  setTimeout(() => window.location.href = CONFIG.DASHBOARD_URL, 2000);
+}
+
+/* ═══════ TELEGRAM LOGIN ═══════ */
+function telegramLogin() {
+  showToast('Telegram-авторизация будет доступна в ближайшее время', '');
+}
+
+/* ═══════ FORGOT PASSWORD ═══════ */
+function forgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) {
+    showError('Введите email, чтобы сбросить пароль');
+    return;
+  }
+  showToast('Инструкции отправлены на ' + email, 'success');
+}
+
+/* ═══════ ENTER KEY ═══════ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('loginForm').classList.contains('active')) {
+      handleLogin();
+    } else if (document.getElementById('registerForm').classList.contains('active')) {
+      handleRegister();
+    }
+  }
+});
+</script>
+</body>
+</html>
