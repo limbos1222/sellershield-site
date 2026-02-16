@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SellerShield — Личный кабинет</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--blue:#2563EB;--blue-dark:#1E40AF;--blue-50:#EFF6FF;--blue-100:#DBEAFE;--blue-200:#BFDBFE;
+--navy:#0F172A;--text:#1E293B;--text-2:#475569;--text-3:#64748B;--text-4:#94A3B8;
+--border:#E2E8F0;--border-2:#CBD5E1;--bg:#FFFFFF;--bg-2:#F8FAFC;--bg-3:#F1F5F9;
+--green:#059669;--green-50:#ECFDF5;--red:#DC2626;--red-50:#FEF2F2;
+--orange:#D97706;--orange-50:#FFFBEB;--purple:#7C3AED;--purple-50:#F5F3FF;
+--sidebar-w:260px;
+}
+body{font-family:'Onest',sans-serif;background:var(--bg-2);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ═══════ LAYOUT ═══════ */
+.dash{display:flex;min-height:100vh}
+
+/* ═══════ SIDEBAR ═══════ */
+.side{width:var(--sidebar-w);background:var(--navy);color:white;padding:24px 0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
+.side-logo{display:flex;align-items:center;gap:10px;padding:0 20px;margin-bottom:32px;text-decoration:none;color:white}
+.side-logo-dot{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900}
+.side-logo-text{font-size:18px;font-weight:800;letter-spacing:-.3px}
+
+.side-nav{flex:1}
+.side-section{margin-bottom:24px}
+.side-section-title{padding:0 20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.25);margin-bottom:8px}
+.side-link{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:14px;font-weight:500;color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.side-link:hover{color:white;background:rgba(255,255,255,.06)}
+.side-link.active{color:white;background:rgba(37,99,235,.3);border-right:3px solid var(--blue)}
+.side-link-icon{font-size:17px;width:22px;text-align:center}
+.side-link .badge{margin-left:auto;background:var(--red);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+
+.side-user{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.side-avatar{width:34px;height:34px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.side-user-info{flex:1;min-width:0}
+.side-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-user-plan{font-size:11px;color:rgba(255,255,255,.35)}
+.side-logout{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:16px;padding:4px;transition:color .2s}
+.side-logout:hover{color:white}
+
+/* ═══════ MAIN ═══════ */
+.main{flex:1;margin-left:var(--sidebar-w);min-height:100vh}
+
+/* Top bar */
+.topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar h1{font-size:20px;font-weight:800;color:var(--navy)}
+.topbar-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px}
+.topbar-status.active{background:var(--green-50);color:var(--green)}
+.topbar-status.trial{background:var(--orange-50);color:var(--orange)}
+.topbar-status.unpaid{background:var(--red-50);color:var(--red)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{padding:8px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;font-family:inherit;transition:all .2s}
+.topbar-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+.burger-dash{display:none;background:none;border:none;font-size:22px;cursor:pointer;padding:4px}
+
+/* Content area */
+.content{padding:28px}
+
+/* ═══════ STATS CARDS ═══════ */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px}
+.stat-label{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.stat-label-icon{font-size:14px}
+.stat-val{font-size:28px;font-weight:900;color:var(--navy);margin-bottom:2px}
+.stat-change{font-size:12px;font-weight:600}
+.stat-up{color:var(--green)}
+.stat-down{color:var(--red)}
+
+/* ═══════ TABLES ═══════ */
+.card{background:var(--bg);border:1px solid var(--border);border-radius:14px;margin-bottom:20px;overflow:hidden}
+.card-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:16px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.card-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--blue-50);color:var(--blue)}
+
+table{width:100%;border-collapse:collapse}
+th{padding:10px 18px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-4);background:var(--bg-2);border-bottom:1px solid var(--border)}
+td{padding:12px 18px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--bg-3)}
+tr:last-child td{border:none}
+tr:hover td{background:var(--bg-2)}
+
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.tag-red{background:var(--red-50);color:var(--red)}
+.tag-green{background:var(--green-50);color:var(--green)}
+.tag-orange{background:var(--orange-50);color:var(--orange)}
+.tag-blue{background:var(--blue-50);color:var(--blue)}
+.tag-purple{background:var(--purple-50);color:var(--purple)}
+
+/* ═══════ CHART placeholder ═══════ */
+.chart-area{height:200px;background:linear-gradient(180deg,var(--blue-50) 0%,transparent 100%);border-radius:12px;margin:16px 22px 22px;display:flex;align-items:flex-end;justify-content:space-around;padding:0 16px 16px;gap:6px}
+.chart-bar{background:var(--blue);border-radius:6px 6px 0 0;width:100%;max-width:48px;transition:height .5s ease;opacity:.7}
+.chart-bar:hover{opacity:1}
+
+/* ═══════ ACTIVITY LOG ═══════ */
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:14px 22px;border-bottom:1px solid var(--bg-3)}
+.activity-item:last-child{border:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.activity-dot.green{background:var(--green)}.activity-dot.red{background:var(--red)}.activity-dot.blue{background:var(--blue)}.activity-dot.orange{background:var(--orange)}
+.activity-text{font-size:13px;color:var(--text-2);flex:1}
+.activity-text strong{color:var(--navy)}
+.activity-time{font-size:11px;color:var(--text-4);white-space:nowrap;margin-top:2px}
+
+/* ═══════ BLUR PAYWALL ═══════ */
+.blur-container{position:relative}
+.blur-container.locked .blur-target{filter:blur(6px);pointer-events:none;user-select:none}
+
+.paywall{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:2px solid var(--blue);border-radius:20px;padding:44px 40px;text-align:center;max-width:460px;width:calc(100% - 40px);box-shadow:0 16px 48px rgba(0,0,0,.1)}
+.blur-container.locked .paywall{display:block;animation:payIn .4s ease}
+@keyframes payIn{from{opacity:0;transform:translate(-50%,-50%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.paywall-icon{font-size:52px;margin-bottom:16px}
+.paywall h2{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.paywall p{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px}
+.paywall-price{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.paywall-price-block{text-align:center}
+.paywall-price-val{font-size:28px;font-weight:900;color:var(--navy)}
+.paywall-price-val span{font-size:14px;color:var(--text-3);font-weight:500}
+.paywall-price-label{font-size:11px;color:var(--text-3)}
+.paywall-plus{color:var(--border-2);font-size:20px}
+.paywall-btn{width:100%;padding:16px;background:var(--blue);color:white;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-bottom:10px}
+.paywall-btn:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.3)}
+.paywall-trial{font-size:13px;color:var(--text-3);display:flex;align-items:center;justify-content:center;gap:6px}
+.paywall-features{text-align:left;margin:20px 0;padding:16px;background:var(--bg-2);border-radius:10px}
+.paywall-features li{font-size:13px;color:var(--text-2);padding:4px 0;list-style:none;display:flex;align-items:center;gap:8px}
+.paywall-features li::before{content:'✓';color:var(--blue);font-weight:700}
+
+/* Fixed paywall banner for mobile */
+.pay-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);color:white;padding:14px 20px;z-index:100;text-align:center;box-shadow:0 -4px 16px rgba(0,0,0,.1)}
+.pay-banner.show{display:block}
+.pay-banner p{font-size:13px;margin-bottom:8px;opacity:.8}
+.pay-banner button{background:var(--blue);color:white;border:none;padding:10px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* ═══════ SETTINGS PAGE ═══════ */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.settings-section{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px}
+.settings-section h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.settings-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.settings-field label{display:block;font-size:12px;font-weight:600;color:var(--text-3);margin-bottom:5px}
+.settings-field input,.settings-field select{width:100%;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--navy);outline:none;transition:border .2s}
+.settings-field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.settings-field input:focus,.settings-field select:focus{border-color:var(--blue)}
+.settings-save{padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.settings-save:hover{background:var(--blue-dark)}
+
+/* ═══════ TOAST ═══════ */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;padding:14px 22px;border-radius:10px;font-size:14px;font-weight:500;z-index:500;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;max-width:340px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media(max-width:900px){
+.side{transform:translateX(-100%)}
+.side.open{transform:translateX(0)}
+.main{margin-left:0}
+.burger-dash{display:block}
+.content{padding:16px}
+.stats{grid-template-columns:1fr 1fr}
+.settings-row{grid-template-columns:1fr}
+table{font-size:12px}
+th,td{padding:8px 12px}
+.paywall{padding:28px 20px}
+}
+@media(max-width:500px){
+.stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside class="side" id="sidebar">
+<a href="index.html" class="side-logo">
+<div class="side-logo-dot">S</div>
+<div class="side-logo-text">SellerShield</div>
+</a>
+
+<div class="side-nav">
+<div class="side-section">
+<div class="side-section-title">Основное</div>
+<button class="side-link active" onclick="showPage('dashboard', this)">
+<span class="side-link-icon">📊</span> Дашборд
+</button>
+<button class="side-link" onclick="showPage('incidents', this)">
+<span class="side-link-icon">⚡</span> Инциденты
+<span class="badge" id="incidentBadge">5</span>
+</button>
+<button class="side-link" onclick="showPage('claims', this)">
+<span class="side-link-icon">📄</span> Претензии
+</button>
+<button class="side-link" onclick="showPage('analytics', this)">
+<span class="side-link-icon">📈</span> Аналитика
+</button>
+</div>
+<div class="side-section">
+<div class="side-section-title">Настройки</div>
+<button class="side-link" onclick="showPage('connections', this)">
+<span class="side-link-icon">🔗</span> API-подключения
+</button>
+<button class="side-link" onclick="showPage('notifications', this)">
+<span class="side-link-icon">🔔</span> Уведомления
+</button>
+<button class="side-link" onclick="showPage('settings', this)">
+<span class="side-link-icon">⚙️</span> Профиль
+</button>
+</div>
+</div>
+
+<div class="side-user">
+<div class="side-avatar" id="userAvatar">?</div>
+<div class="side-user-info">
+<div class="side-user-name" id="userName">Загрузка...</div>
+<div class="side-user-plan" id="userPlan">—</div>
+</div>
+<button class="side-logout" onclick="logout()" title="Выйти">⏻</button>
+</div>
+</aside>
+
+<!-- ═══════ MAIN ═══════ -->
+<div class="main">
+
+<!-- Topbar -->
+<div class="topbar">
+<div class="topbar-left">
+<button class="burger-dash" onclick="toggleSidebar()">☰</button>
+<h1 id="pageTitle">Дашборд</h1>
+<span class="topbar-status unpaid" id="planStatus">Не оплачен</span>
+</div>
+<div class="topbar-right">
+<button class="topbar-btn" onclick="showPage('connections', document.querySelector('[onclick*=connections]'))">🔗 Подключить API</button>
+</div>
+</div>
+
+<!-- Content wrapper with blur -->
+<div class="blur-container locked" id="blurContainer">
+
+<!-- ═══════ PAYWALL OVERLAY ═══════ -->
+<div class="paywall" id="paywall">
+<div class="paywall-icon">🛡️</div>
+<h2>Активируйте SellerShield</h2>
+<p>Ваш аккаунт создан. Оплатите подписку, чтобы агент начал мониторинг и возврат ваших денег.</p>
+<div class="paywall-price">
+<div class="paywall-price-block">
+<div class="paywall-price-val">9 990<span>₽/мес</span></div>
+<div class="paywall-price-label">подписка</div>
+</div>
+<div class="paywall-plus">+</div>
+<div class="paywall-price-block">
+<div class="paywall-price-val">5<span>%</span></div>
+<div class="paywall-price-label">от возврата</div>
+</div>
+</div>
+<ul class="paywall-features">
+<li>Мониторинг WB, Ozon, Яндекс 24/7</li>
+<li>Автоматические AI-претензии</li>
+<li>Telegram-уведомления</li>
+<li>Аналитика потерь в реальном времени</li>
+</ul>
+<button class="paywall-btn" onclick="handlePayment()">Оплатить и начать — 9 990₽/мес</button>
+<div class="paywall-trial">🔒 Первые 7 дней бесплатно · Отмена в любой момент</div>
+</div>
+
+<!-- ═══════ PAGE: DASHBOARD ═══════ -->
+<div class="content blur-target" id="contentArea">
+
+<div class="page active" id="page-dashboard">
+<div class="stats">
+<div class="stat-card">
+<div class="stat-label"><span class="stat-label-icon">💰</span> Возвращено</div>
+<div class="stat-val">₽247 800</div>
+<div class="stat-change stat-up">↑ +₽38 400 за неделю</div>
+</div>
+<div class="stat-card">
+<div class="stat-label"><span class="stat-label-icon">⚡</span> Найдено инцидентов</div>
+<div class="stat-val">23</div>
+<div class="stat-change stat-up">↑ 5 новых</div>
+</div>
+<div class="stat-card">
+<div class="stat-label"><span class="stat-label-icon">📄</span> Подано претензий</div>
+<div class="stat-val">18</div>
+<div class="stat-change stat-up">↑ 3 за неделю</div>
+</div>
+<div class="stat-card">
+<div class="stat-label"><span class="stat-label-icon">✅</span> Успешность</div>
+<div class="stat-val">78%</div>
+<div class="stat-change stat-up">↑ +4% к прошлому месяцу</div>
+</div>
+</div>
+
+<!-- Chart -->
+<div class="card">
+<div class="card-head">
+<div class="card-title">📈 Возвраты по дням</div>
+<div class="card-badge">Февраль 2026</div>
+</div>
+<div class="chart-area" id="chart"></div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card">
+<div class="card-head">
+<div class="card-title">🔔 Последние события</div>
+</div>
+<div class="activity-item"><div class="activity-dot green"></div><div class="activity-text"><strong>Претензия #WB-1247</strong> — штраф 23 500₽ возвращён на баланс</div><div class="activity-time">2 часа назад</div></div>
+<div class="activity-item"><div class="activity-dot blue"></div><div class="activity-text"><strong>Новый инцидент:</strong> переплата комиссии 8 700₽ за категорию «Обувь»</div><div class="activity-time">5 часов назад</div></div>
+<div class="activity-item"><div class="activity-dot orange"></div><div class="activity-text"><strong>Претензия #OZ-892</strong> — ожидает ответа Ozon (день 6 из 14)</div><div class="activity-time">вчера</div></div>
+<div class="activity-item"><div class="activity-dot green"></div><div class="activity-text"><strong>Потерянный товар:</strong> 12 ед. «Кроссовки Nike Air» — компенсация 45 600₽ получена</div><div class="activity-time">вчера</div></div>
+<div class="activity-item"><div class="activity-dot red"></div><div class="activity-text"><strong>Отклонено:</strong> претензия #WB-1198 — подана повторно с усиленными аргументами</div><div class="activity-time">2 дня назад</div></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE: INCIDENTS ═══════ -->
+<div class="page" id="page-incidents">
+<div class="stats">
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">🔴</span> Критические</div><div class="stat-val">2</div></div>
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">🟡</span> На проверке</div><div class="stat-val">8</div></div>
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">🟢</span> Решённые</div><div class="stat-val">13</div></div>
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">💸</span> Сумма к возврату</div><div class="stat-val">₽186 400</div></div>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">⚡ Все инциденты <span class="card-badge">23</span></div></div>
+<table>
+<thead><tr><th>Дата</th><th>Площадка</th><th>Тип</th><th>Сумма</th><th>Статус</th><th>Шанс</th></tr></thead>
+<tbody>
+<tr><td>16.02.2026</td><td><span class="tag tag-purple">WB</span></td><td>Штраф</td><td style="font-weight:700;color:var(--navy)">₽23 500</td><td><span class="tag tag-red">Новый</span></td><td>83%</td></tr>
+<tr><td>15.02.2026</td><td><span class="tag tag-blue">Ozon</span></td><td>Потеря товара</td><td style="font-weight:700;color:var(--navy)">₽45 600</td><td><span class="tag tag-green">Возвращён</span></td><td>91%</td></tr>
+<tr><td>15.02.2026</td><td><span class="tag tag-purple">WB</span></td><td>Переплата</td><td style="font-weight:700;color:var(--navy)">₽8 700</td><td><span class="tag tag-orange">Анализ</span></td><td>67%</td></tr>
+<tr><td>14.02.2026</td><td><span class="tag tag-purple">WB</span></td><td>Штраф</td><td style="font-weight:700;color:var(--navy)">₽15 200</td><td><span class="tag tag-blue">Претензия</span></td><td>76%</td></tr>
+<tr><td>13.02.2026</td><td><span class="tag tag-blue">Ozon</span></td><td>Подмена</td><td style="font-weight:700;color:var(--navy)">₽12 800</td><td><span class="tag tag-orange">Ожидание</span></td><td>58%</td></tr>
+<tr><td>12.02.2026</td><td><span class="tag tag-purple">WB</span></td><td>Штраф</td><td style="font-weight:700;color:var(--navy)">₽31 000</td><td><span class="tag tag-green">Возвращён</span></td><td>89%</td></tr>
+<tr><td>11.02.2026</td><td><span class="tag tag-blue">Ozon</span></td><td>Потеря товара</td><td style="font-weight:700;color:var(--navy)">₽67 200</td><td><span class="tag tag-green">Возвращён</span></td><td>94%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- ═══════ PAGE: CLAIMS ═══════ -->
+<div class="page" id="page-claims">
+<div class="card">
+<div class="card-head"><div class="card-title">📄 Претензии <span class="card-badge">18</span></div></div>
+<table>
+<thead><tr><th>Номер</th><th>Дата</th><th>Площадка</th><th>Тип</th><th>Сумма</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:600;color:var(--blue)">#WB-1247</td><td>16.02</td><td>WB</td><td>Штраф</td><td>₽23 500</td><td><span class="tag tag-green">Одобрена ✓</span></td></tr>
+<tr><td style="font-weight:600;color:var(--blue)">#OZ-892</td><td>10.02</td><td>Ozon</td><td>Потеря</td><td>₽45 600</td><td><span class="tag tag-orange">На рассмотрении</span></td></tr>
+<tr><td style="font-weight:600;color:var(--blue)">#WB-1198</td><td>08.02</td><td>WB</td><td>Штраф</td><td>₽15 200</td><td><span class="tag tag-red">Отклонена → повтор</span></td></tr>
+<tr><td style="font-weight:600;color:var(--blue)">#WB-1156</td><td>05.02</td><td>WB</td><td>Переплата</td><td>₽31 000</td><td><span class="tag tag-green">Одобрена ✓</span></td></tr>
+<tr><td style="font-weight:600;color:var(--blue)">#OZ-841</td><td>03.02</td><td>Ozon</td><td>Потеря</td><td>₽67 200</td><td><span class="tag tag-green">Одобрена ✓</span></td></tr>
+<tr><td style="font-weight:600;color:var(--blue)">#WB-1102</td><td>01.02</td><td>WB</td><td>Блокировка</td><td>₽—</td><td><span class="tag tag-green">Разблокирована ✓</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- ═══════ PAGE: ANALYTICS ═══════ -->
+<div class="page" id="page-analytics">
+<div class="stats">
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">📊</span> Потери за месяц</div><div class="stat-val">₽312 600</div><div class="stat-change stat-down">↑ рост потерь 12%</div></div>
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">💰</span> Возвращено</div><div class="stat-val">₽247 800</div><div class="stat-change stat-up">79% от потерь</div></div>
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">📉</span> Не возвращено</div><div class="stat-val">₽64 800</div></div>
+<div class="stat-card"><div class="stat-label"><span class="stat-label-icon">⏱</span> Ср. время возврата</div><div class="stat-val">9 дней</div></div>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">📈 Динамика возвратов</div></div>
+<div class="chart-area" id="chart2"></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE: CONNECTIONS ═══════ -->
+<div class="page" id="page-connections">
+<div class="settings-section">
+<h3>🔗 API-подключения</h3>
+<div class="settings-row">
+<div class="settings-field"><label>Wildberries API ключ</label><input type="password" placeholder="Вставьте API ключ WB" id="wbKey"></div>
+<div class="settings-field"><label>Статус</label><input type="text" value="Не подключён" disabled style="color:var(--red)"></div>
+</div>
+<div class="settings-row">
+<div class="settings-field"><label>Ozon Client ID</label><input type="text" placeholder="Client ID" id="ozClientId"></div>
+<div class="settings-field"><label>Ozon API ключ</label><input type="password" placeholder="API ключ Ozon" id="ozKey"></div>
+</div>
+<button class="settings-save" onclick="showToast('API ключи сохранены','success')">Сохранить подключения</button>
+</div>
+</div>
+
+<!-- ═══════ PAGE: NOTIFICATIONS ═══════ -->
+<div class="page" id="page-notifications">
+<div class="settings-section">
+<h3>🔔 Telegram-бот</h3>
+<div class="settings-row">
+<div class="settings-field"><label>Telegram Bot Token</label><input type="text" placeholder="Токен от @BotFather" id="tgToken"></div>
+<div class="settings-field"><label>Ваш Chat ID</label><input type="text" placeholder="Числовой ID" id="tgChatId"></div>
+</div>
+<button class="settings-save" onclick="showToast('Настройки Telegram сохранены','success')">Сохранить</button>
+</div>
+<div class="settings-section">
+<h3>📧 Email-уведомления</h3>
+<div class="settings-field" style="max-width:400px"><label>Email для отчётов</label><input type="email" placeholder="ivan@example.com" id="notifEmail"></div>
+<button class="settings-save" style="margin-top:14px" onclick="showToast('Email сохранён','success')">Сохранить</button>
+</div>
+</div>
+
+<!-- ═══════ PAGE: SETTINGS ═══════ -->
+<div class="page" id="page-settings">
+<div class="settings-section">
+<h3>👤 Профиль</h3>
+<div class="settings-row">
+<div class="settings-field"><label>Имя</label><input type="text" id="setName"></div>
+<div class="settings-field"><label>Email</label><input type="email" id="setEmail"></div>
+</div>
+<div class="settings-row">
+<div class="settings-field"><label>Телефон</label><input type="text" id="setPhone"></div>
+<div class="settings-field"><label>Компания</label><input type="text" placeholder="Необязательно" id="setCompany"></div>
+</div>
+<button class="settings-save" onclick="saveProfile()">Сохранить профиль</button>
+</div>
+<div class="settings-section">
+<h3>💳 Подписка</h3>
+<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+<div>
+<div style="font-size:14px;font-weight:700;color:var(--navy)" id="subStatus">Не активна</div>
+<div style="font-size:13px;color:var(--text-3)" id="subDetails">Оплатите подписку для активации</div>
+</div>
+<button class="settings-save" onclick="handlePayment()" id="subBtn">Оплатить 9 990₽/мес</button>
+</div>
+</div>
+<div class="settings-section">
+<h3 style="color:var(--red)">⚠️ Опасная зона</h3>
+<button style="padding:10px 20px;background:var(--red-50);color:var(--red);border:1px solid #FECACA;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="if(confirm('Удалить аккаунт? Это необратимо.')){logout()}">Удалить аккаунт</button>
+</div>
+</div>
+
+</div><!-- /contentArea -->
+</div><!-- /blur-container -->
+</div><!-- /main -->
+
+<!-- Mobile pay banner -->
+<div class="pay-banner" id="payBanner">
+<p>Активируйте подписку для доступа к панели</p>
+<button onclick="handlePayment()">Оплатить 9 990₽/мес</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════ CONFIG ═══════ */
+const CONFIG = {
+  TELEGRAM_BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',
+  TELEGRAM_CHAT_ID: 'YOUR_CHAT_ID_HERE',
+  TELEGRAM_SUPPORT: 'https://t.me/sellershield',
+  LOGIN_URL: 'register.html'
+};
+
+/* ═══════ AUTH CHECK ═══════ */
+let currentUser = null;
+
+function checkAuth() {
+  const data = localStorage.getItem('ss_current_user');
+  
+  if (!data) {
+    // Если нет залогиненного пользователя — проверяем, есть ли register.html
+    // Если мы на реальном сервере — редиректим
+    // Если локально — создаём демо-юзера, чтобы дашборд не ломался
+    try {
+      const isLocalFile = window.location.protocol === 'file:';
+      if (!isLocalFile) {
+        window.location.href = CONFIG.LOGIN_URL;
+        return;
+      }
+    } catch(e) {}
+    
+    // Создаём демо-пользователя для локального просмотра
+    currentUser = {
+      id: 'demo',
+      name: 'Демо',
+      surname: 'Пользователь',
+      email: 'demo@sellershield.ru',
+      phone: '+7 900 000-00-00',
+      market: 'wb',
+      plan: 'free',
+      created: new Date().toISOString()
+    };
+    localStorage.setItem('ss_current_user', JSON.stringify(currentUser));
+  } else {
+    currentUser = JSON.parse(data);
+  }
+  
+  // Update UI
+  document.getElementById('userName').textContent = currentUser.name + ' ' + (currentUser.surname || '');
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  
+  // Check plan
+  if (currentUser.plan === 'paid') {
+    unlockDashboard();
+  } else {
+    lockDashboard();
+  }
+
+  // Fill settings
+  document.getElementById('setName').value = currentUser.name || '';
+  document.getElementById('setEmail').value = currentUser.email || '';
+  document.getElementById('setPhone').value = currentUser.phone || '';
+}
+
+function lockDashboard() {
+  document.getElementById('blurContainer').classList.add('locked');
+  document.getElementById('planStatus').textContent = 'Не оплачен';
+  document.getElementById('planStatus').className = 'topbar-status unpaid';
+  document.getElementById('userPlan').textContent = 'Бесплатный';
+  document.getElementById('subStatus').textContent = 'Не активна';
+  document.getElementById('subDetails').textContent = 'Оплатите подписку для активации';
+  document.getElementById('subBtn').style.display = '';
+  // Show mobile banner
+  if (window.innerWidth <= 900) {
+    document.getElementById('payBanner').classList.add('show');
+  }
+}
+
+function unlockDashboard() {
+  document.getElementById('blurContainer').classList.remove('locked');
+  document.getElementById('planStatus').textContent = 'Активен';
+  document.getElementById('planStatus').className = 'topbar-status active';
+  document.getElementById('userPlan').textContent = '9 990₽/мес';
+  document.getElementById('subStatus').textContent = 'Активна до 16.03.2026';
+  document.getElementById('subDetails').textContent = 'Автопродление включено';
+  document.getElementById('subBtn').textContent = 'Управление подпиской';
+  document.getElementById('payBanner').classList.remove('show');
+}
+
+/* ═══════ PAYMENT (заглушка → Telegram) ═══════ */
+async function handlePayment() {
+  // Отправляем запрос на оплату в Telegram
+  if (CONFIG.TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN_HERE' && currentUser) {
+    const msg = `💳 *Запрос на оплату*\n\n👤 ${currentUser.name} ${currentUser.surname || ''}\n📧 ${currentUser.email}\n📱 ${currentUser.phone}\n💰 Тариф: 9 990₽/мес + 5%\n📅 ${new Date().toLocaleString('ru-RU')}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CONFIG.TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+      });
+    } catch (e) { console.warn('TG failed:', e); }
+  }
+
+  // Открываем Telegram для связи
+  showToast('Перенаправляем для оплаты...', 'success');
+  setTimeout(() => {
+    window.open(CONFIG.TELEGRAM_SUPPORT, '_blank');
+  }, 1000);
+
+  console.log('💳 PAYMENT REQUEST:', currentUser);
+
+  // Для демо: разблокировать после "оплаты"
+  // В реальности — проверять через webhook
+}
+
+/* ═══════ DEMO: ADMIN UNLOCK (для тестирования) ═══════ */
+// Введите в консоли: unlockUser() — чтобы разблокировать дашборд
+window.unlockUser = function() {
+  if (currentUser) {
+    currentUser.plan = 'paid';
+    localStorage.setItem('ss_current_user', JSON.stringify(currentUser));
+    const users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+    const idx = users.findIndex(u => u.email === currentUser.email);
+    if (idx !== -1) { users[idx].plan = 'paid'; localStorage.setItem('ss_users', JSON.stringify(users)); }
+    unlockDashboard();
+    showToast('Подписка активирована!', 'success');
+  }
+};
+
+/* ═══════ PAGE NAVIGATION ═══════ */
+const pageTitles = {
+  dashboard: 'Дашборд', incidents: 'Инциденты', claims: 'Претензии',
+  analytics: 'Аналитика', connections: 'API-подключения',
+  notifications: 'Уведомления', settings: 'Профиль и подписка'
+};
+
+function showPage(page, linkEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+  if (linkEl) linkEl.classList.add('active');
+  document.getElementById('pageTitle').textContent = pageTitles[page] || 'Дашборд';
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+/* ═══════ SIDEBAR TOGGLE ═══════ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+/* ═══════ PROFILE SAVE ═══════ */
+function saveProfile() {
+  if (!currentUser) return;
+  currentUser.name = document.getElementById('setName').value;
+  currentUser.email = document.getElementById('setEmail').value;
+  currentUser.phone = document.getElementById('setPhone').value;
+  localStorage.setItem('ss_current_user', JSON.stringify(currentUser));
+  
+  const users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx !== -1) { users[idx] = { ...users[idx], ...currentUser }; localStorage.setItem('ss_users', JSON.stringify(users)); }
+  
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  showToast('Профиль сохранён', 'success');
+}
+
+/* ═══════ LOGOUT ═══════ */
+function logout() {
+  localStorage.removeItem('ss_current_user');
+  const isLocalFile = window.location.protocol === 'file:';
+  if (isLocalFile) {
+    // Локально — просто перезагружаем, создастся демо-юзер
+    window.location.reload();
+  } else {
+    window.location.href = CONFIG.LOGIN_URL;
+  }
+}
+
+/* ═══════ CHARTS (демо-данные) ═══════ */
+function renderCharts() {
+  const data = [12,28,18,42,35,58,22,47,31,65,38,52,71,45,33,61];
+  const max = Math.max(...data);
+  
+  ['chart', 'chart2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    data.forEach((v, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'chart-bar';
+      bar.style.height = '0px';
+      bar.title = '₽' + (v * 1000).toLocaleString('ru-RU');
+      el.appendChild(bar);
+      setTimeout(() => {
+        bar.style.height = (v / max * 160) + 'px';
+      }, 100 + i * 50);
+    });
+  });
+}
+
+/* ═══════ TOAST ═══════ */
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show ' + type;
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+/* ═══════ INIT ═══════ */
+checkAuth();
+renderCharts();
+</script>
+</body>
+</html>
